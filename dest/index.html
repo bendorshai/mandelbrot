@@ -1,0 +1,36 @@
+<html>
+
+<head>
+    <script src="./bundle.js"></script>
+    <script>
+        let scale = 1;
+        let panel, canvas, space;
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            canvas = document.getElementById('canvas');
+            panel = document.getElementById('panel');
+            const ctx = window.ctx = canvas.getContext('2d');
+            setCanvasFullscreen(canvas);
+            setPanelDisplay(panel);
+
+            // Add event listener for `click` events.
+            canvas.addEventListener('dblclick', dbClickDelegate, false);
+
+            space = renderSpace(-3, -3, 6, 0.01, function (space) { 
+                fractalDraw(canvas, ctx, space);
+            });
+        });
+
+    </script>
+</head>
+
+<body>
+    <div id="panel">
+        <span id="scale">
+        </span>
+    </div>
+    <canvas id="canvas"></div>
+</body>
+
+</html>

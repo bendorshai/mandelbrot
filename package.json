@@ -1,0 +1,19 @@
+{
+  "name": "mandelbrot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify ./src/brot.js ./src/draw.js ./src/pov.js ./src/window.js -o ./dest/bundle.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mathjs": "^7.2.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.11.6",
+    "@babel/core": "^7.11.6"
+  }
+}

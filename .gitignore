@@ -1,0 +1,5 @@
+.vscode/**
+.misc/**
+
+dest/bundle.js
+node_modules/**
