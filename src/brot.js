@@ -1,22 +1,24 @@
 const math = require('mathjs');
-const PRECISION = 20;
 
-exports.converges = function (c) {
-    const z = zetaDistance(c, PRECISION ? PRECISION : 1200);
-    if (z ==  Infinity) return false;
+exports.converges = function (c, limit) {
+    const z = zetaData(c, limit ? limit : 120);
+    if (z.distance ==  Infinity) return false;
     return true;
 }
 
-const zetaDistance = function (c, n, distancesArrayPtr) {
+exports.convergenceDelay = function (c, limit) {
+    const z = zetaData(c, limit ? limit : 120);
+    return z.iterations;
+}
+
+const zetaData = function (c, n, distancesArrayPtr) {
     if (n == 0) {
         return math.complex(0, 0);
-    } else if (this.panic) {
-        return Infinity;
-    }
+    } 
 
     let val = math.complex(0,0); // Initial Z0 value in Mandalbrot
     let dist;
-    for (i = 0; i < n; i++) {
+    for (i = 1; i <= n; i++) {
 
         val = math.chain(val)
             .multiply(val)
@@ -28,45 +30,16 @@ const zetaDistance = function (c, n, distancesArrayPtr) {
             distancesArrayPtr.push(dist);
         }
 
-        // if (dist > 2) { // Note: apperently above 2 is practicly approaching Infinity
-        //     break;
-        // }
         if (dist == Infinity) { // Note: apperently above 2 is practicly approaching Infinity
             break;
         }
     }
 
-    return dist;
+    return {
+        distance: dist,
+        iterations: Math.min(i,n)
+    };
 }
-
-function zetaRecursive(c, n, distancesArrayPtr) {
-    if (n == 0) {
-        return math.complex(0, 0);
-    } else if (n == 1) {
-        if (distancesArrayPtr) {
-            const dist = complexDistance(c);
-            distancesArrayPtr.push(dist);
-        }
-        return c;
-    }
-
-    const prev = zeta(c, n - 1,
-        distancesArrayPtr != undefined ? distancesArrayPtr : undefined,
-    );
-
-    const val = math.chain(prev)
-        .multiply(prev)
-        .add(prev)
-        .done();
-
-    if (distancesArrayPtr) {
-        const dist = complexDistance(val);
-        distancesArrayPtr.push(dist);
-    }
-
-    return val;
-}
-
 
 function complexDistance(c1, c2) {
     if (!c2) c2 = math.complex(0,0);

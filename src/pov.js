@@ -1,6 +1,8 @@
 const brot = require('./brot.js');
 const math = require('mathjs');
 
+const LIMIT = 50;
+
 // need perspective of space.
 // center point. (x,y), depth (z).
 
@@ -16,7 +18,8 @@ const renderSpace = function(minx,miny,len, resolution, onRendered) {
                 coords.push({ 
                     x: x,
                     y: y,
-                    conv: brot.converges(cmplx)
+                    // conv: brot.converges(cmplx, LIMIT)
+                    conv: brot.convergenceDelay(cmplx, LIMIT)
                 });
             }
         }
@@ -30,28 +33,36 @@ const renderSpace = function(minx,miny,len, resolution, onRendered) {
         height: len,
         resolutionAim: resolution,
         currentResolution: currentResolution,
+        depthLimit: LIMIT,
         status: 'idle...',
         next: function() { 
             // if last:
-            if (currentResolution * 0.1 < this.resolutionAim) { 
-                // final generation had passed.
-                delete this.next;
-                this.status = 'done';
-                return this;
+            let last = false;
+            let nextReolution = currentResolution * 0.1;
+
+            // Simply overcoming float bug (nextReolution < this.resolutionAim)
+            if (math.abs(nextReolution - this.resolutionAim) < this.resolutionAim) { 
+                last = true;
+                nextReolution = this.resolutionAim;
             }
 
             this.status = 'rendering...';
             // Could be better. if did not include the rendering of locations from last state
-            const newCoords = render (minx,miny,len, currentResolution * 0.1)
+            const newCoords = render (minx,miny,len, nextReolution)
             this.status = 'idle...';
-            this.coords = newCoords
+            this.coords = newCoords;
             this.currentResolution = currentResolution = currentResolution * 0.1;
             let that = this;
             if (onRendered) onRendered(this);
             
-            setTimeout(function() {
-                that = that.next();
-            }, 1000);
+            if (last) { 
+                delete this.next;
+                this.status = 'done';
+            } else {
+                setTimeout(function() {
+                    that = that.next();
+                }, 300);
+            }
 
             return this;
         },

@@ -1,10 +1,12 @@
 <html>
-
+<!-- 
+    1. render z widthly
+-->
 <head>
     <script src="./bundle.js"></script>
     <script>
         let scale = 1;
-        let panel, canvas, space;
+        let panel, canvas;
 
         document.addEventListener("DOMContentLoaded", function () {
 
@@ -17,9 +19,7 @@
             // Add event listener for `click` events.
             canvas.addEventListener('dblclick', dbClickDelegate, false);
 
-            space = renderSpace(-3, -3, 6, 0.01, function (space) { 
-                fractalDraw(canvas, ctx, space);
-            });
+            initSpace();
         });
 
     </script>
