@@ -54,11 +54,22 @@ window.fractalDraw = function (canvas, ctx, space) {
             touch(coord);
         } else if (coord.conv) {
 
-            if (typeof (coord.conv) == 'boolean') {
-                ctx.fillStyle = "#8A8A8A"; // not converge colour
-            } else if (typeof (coord.conv) == 'number') {
+            let iterationDepth = 0;
+
+            if (coord.conv.constructor.name === "Function") { 
+                iterationDepth = coord.conv();
+            } else {
+                iterationDepth = coord.conv;
+            }
+
+            if (typeof (iterationDepth) == 'boolean') {
+                if (iterationDepth) 
+                    ctx.fillStyle = "#8A8A8A";
+                else 
+                    ctx.fillStyle = "#FFFFFF";
+            } else if (typeof (iterationDepth) == 'number') {
                 // Convert stabillity to array index
-                const index = Math.round(coord.conv / space.depthLimit * (rainbowColors.length - 1));
+                const index = Math.round(iterationDepth / coord.zetaProcess.limit * (rainbowColors.length - 1));
                 ctx.fillStyle = rainbowColors[index];
             }
 

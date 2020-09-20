@@ -1,6 +1,17 @@
-window.initSpace = function() { 
-    window.space = renderSpace(-2.5, -2.5, 5, 0.01, function (space) { 
-        fractalDraw(canvas, ctx, space);
+
+window._screenInt = undefined;
+function restartScreenLoop() {
+    if (window._screenInt) clearInterval(window._screenInt);
+
+    window._screenInt = setInterval(function () {
+        fractalDraw(canvas, ctx, window.space);
+        drawSelection(window.downPos.x, window.downPos.y, window.downPos.x, window.downPos.y);
+    }, 100)
+}
+
+window.initSpace = function () {
+    window.space = renderSpace(-2.5, -2.5, 5, 0.01, function (space) {
+        restartScreenLoop(space);
     });
 }
 
@@ -48,11 +59,11 @@ window.dbClickDelegate = function (event) {
     alert("x: " + spaceCoord.x + ", y: " + spaceCoord.y);
 }
 
-function getSpaceCoord(x,y) {
-    return getSpacePosition(canvas, space, getCanvasCoord(x,y));
+function getSpaceCoord(x, y) {
+    return getSpacePosition(canvas, space, getCanvasCoord(x, y));
 }
 
-function getCanvasCoord(clientX,clientY) {
+function getCanvasCoord(clientX, clientY) {
     const elemLeft = canvas.offsetLeft + canvas.clientLeft,
         elemTop = canvas.offsetTop + canvas.clientTop,
         x = clientX - elemLeft,
@@ -78,38 +89,34 @@ window.addEventListener("mouseup", function (e) {
     if (!isSelecting) return;
 
     upPos = getCanvasCoord(event.clientX, event.clientY);
-
-    fractalDraw(canvas, ctx, space);
-    drawSelection(window.downPos.x, window.downPos.y, e.offsetX, e.offsetY);
-
     isSelecting = false;
 });
 
 window.addEventListener('mousemove', e => {
     if (!isSelecting) return;
 
-    drawSelection(window.downPos.x, window.downPos.y, e.offsetX, e.offsetY);
+    drawSelection(window.downPos.x, window.downPos.y, e.clientX, e.clientY);
 });
 
-window.addEventListener('keypress', function(e) { 
+window.addEventListener('keypress', function (e) {
     if (e.keyCode == 13) {
-        
+
         const spacePos = getSpaceCoord(window.downPos.x, window.downPos.y);
         const spaceLimitPos = getSpaceCoord(window.upPos.x, window.upPos.y);
         const len = Math.abs(spacePos.x - spaceLimitPos.x);
 
-        window.space = renderSpace(spacePos.x, spacePos.y, len, len / 300, function (space) { 
-            fractalDraw(canvas, ctx, space);
+        window.space = renderSpace(spacePos.x, spacePos.y, len, len / 300, function (space) {
+            restartScreenLoop();
         });
     }
 });
 
 function logKey(e) {
-  log.textContent += ` ${e.code}`;
+    log.textContent += ` ${e.code}`;
 }
 
 function drawSelection(x1, y1, x2, y2) {
-    
+
     const deltaX = x2 - x1;
     const deltaY = y2 - y1;
     const rectSize = Math.max(deltaX, deltaY);
